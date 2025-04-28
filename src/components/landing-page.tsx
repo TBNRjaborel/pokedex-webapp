@@ -1,54 +1,60 @@
-
-"use client";
+"use client"
 import { poppins } from "@/utils/fonts";
 import Image from "next/image";
-import { getPokemonList, Pokemon } from "@/utils/pokemon";
-import { useState } from "react";
+import { Pokemon } from "@/utils/pokemon";
+import { useEffect, useState } from "react";
 
 
 
 
-async function LandingPage({ pokemons = [] }){
-    const pokemonList = await getPokemonList();
-    const [sortoption, setSortOption] = useState("");
+function LandingPage(){
+    const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
+    const [limit, setLimit] = useState(10);
 
+    useEffect(() => {
+        async function fetchPokemonList() {
+            const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}`);
+            const data = await res.json();
+            
+            const detailedPokemonList = await Promise.all(
+                data.results.map(async (pokemon: { name: string; url: string }) => {
+                    const detailsRes = await fetch(pokemon.url);
+                    const details = await detailsRes.json();
+                    
+                    return {
+                        name: pokemon.name,
+                        type: details.types.map((typeInfo: { type: { name: string } }) => typeInfo.type.name).join(", "),
+                        url: pokemon.url,
+                        id: details.id,
+                    };
+                })
+            );
+            setPokemonList(detailedPokemonList);
+        }
+        fetchPokemonList();
 
+    
+    }, [limit]);
 
-    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSortOption(event.target.value);
+    const SeeMore = () => {
+        setLimit(100000);
     }
-
-
     return(
         <div className="flex flex-col items-center">
-            <div className="flex  justify-between w-full max-w-4xl mt-10 px-5">
+            <div className="flex flex-col my-10">
                 <h1 className={`${poppins.className} text-5xl text-white`}>
                     Welcome to the Pokedex
                 </h1>
-                <div className="p-4">
-                    <label className="block mb-2 text-sm font-medium text-gray-700">Sort by:</label>
-                    <select
-                        value={sortoption}
-                        onChange={handleChange}
-                        className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        <option value="">Select option</option>
-                        <option value="name-asc">Name A-Z</option>
-                        <option value="name-desc">Name Z-A</option>
-                        <option value="id-asc">ID Low-High</option>
-                        <option value="id-desc">ID High-Low</option>
-                    </select>
-                </div>
+                
                 
             </div>
-            <div className="flex flex-wrap justify-center gap-5">
+            <div className="flex flex-wrap justify-center gap-10 mb-10">
 
                 {pokemonList.map((pokemon, index) => {
                     
                     const formattedId = String(index + 1).padStart(3, "0");
                     return(
-
-                        <div key = {index}className="bg-white rounded-lg shadow-lg w-70 h-70 mt-10 justify-end flex flex-col items-center">
+                        <div key = {index}className="bg-white rounded-lg shadow-lg w-70 h-70 mt-10 justify-end flex flex-col items-center hover:scale-110 transition-transform duration-200">
                             <Image
                                 src={`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${formattedId}.png`}
                                 alt="Pokemon"
@@ -67,6 +73,12 @@ async function LandingPage({ pokemons = [] }){
                         </div>
                     )
                 })}
+                
+            </div>
+            <div className="my-10">
+                <button onClick={SeeMore} className="bg-white text-black py-2 px-4 rounded hover:bg-black hover:text-white transition duration-300 ease-in-out cursor-pointer">
+                    See More
+                </button>
             </div>
         </div>
     )
