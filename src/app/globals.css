@@ -2,4 +2,11 @@
 
 body {
     @apply bg-gray-600;
+    background-image: url('/pictures/forest.jpg');
+    background-size: cover;
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-position: center;
+    
 }
+
+

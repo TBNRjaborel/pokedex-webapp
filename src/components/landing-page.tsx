@@ -10,7 +10,9 @@ import Link from 'next/link';
 
 function LandingPage(){
     const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
+    const [allPokemon, setAllPokemon] = useState<Pokemon[]>([]);
     const [limit, setLimit] = useState(10);
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
         async function fetchPokemonList() {
@@ -31,6 +33,7 @@ function LandingPage(){
                 })
             );
             setPokemonList(detailedPokemonList);
+            setAllPokemon(detailedPokemonList);
         }
         fetchPokemonList();
 
@@ -40,23 +43,42 @@ function LandingPage(){
     const SeeMore = () => {
         setLimit(100000);
     }
+    const handleSearch = () => {
+        const filtered = allPokemon.filter((pokemon) =>
+            pokemon.name.toLowerCase().includes(search.toLowerCase()) || 
+            String(pokemon.id) === search
+        );
+        setPokemonList(filtered);
+    };
     return(
         <div className="flex flex-col items-center">
-            <div className="flex flex-col my-10">
-                <h1 className={`${poppins.className} text-5xl text-white`}>
+            <div className="flex flex-col my-10 items-center">
+                <h1 className={`${poppins.className} text-6xl text-black font-bold`}>
                     Pokédex
                 </h1>
-                
+                <input
+                    type="text"
+                    placeholder="Search Pokemon" 
+                    className="bg-white mt-10 rounded-lg px-20 py-2 text-center w-72"
+                    value={search}
+                    onChange={(e)=> setSearch(e.target.value)}
+                    onKeyDown={(e)=> {
+                        if(e.key === "Enter"){
+                            handleSearch();
+                        }
+                    }}
+                />
+                <button></button>  
                 
             </div>
             <div className="flex flex-wrap justify-center gap-10 mb-10">
 
                 {pokemonList.map((pokemon, index) => {
                     
-                    const formattedId = String(index + 1).padStart(3, "0");
+                    const formattedId = String(pokemon.id).padStart(3, "0");
                     return(
                         <Link href={`/pokemon/${pokemon.id}`} key={pokemon.id}>
-                            <div className="bg-white rounded-lg shadow-lg w-70 h-70 mt-10 justify-end flex flex-col items-center hover:scale-110 transition-transform duration-200 cursor-pointer">
+                            <div className="bg-white rounded-lg w-70 h-70 mt-10 justify-end flex flex-col items-center hover:scale-110 transition-transform duration-200 cursor-pointer capitalize">
                                 <Image
                                     src={`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${formattedId}.png`}
                                     alt="Pokemon"
