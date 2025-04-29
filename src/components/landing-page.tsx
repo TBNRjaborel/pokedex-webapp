@@ -3,6 +3,7 @@ import { poppins } from "@/utils/fonts";
 import Image from "next/image";
 import { Pokemon } from "@/utils/pokemon";
 import { useEffect, useState } from "react";
+import Link from 'next/link';
 
 
 
@@ -43,7 +44,7 @@ function LandingPage(){
         <div className="flex flex-col items-center">
             <div className="flex flex-col my-10">
                 <h1 className={`${poppins.className} text-5xl text-white`}>
-                    Welcome to the Pokedex
+                    Pokédex
                 </h1>
                 
                 
@@ -54,23 +55,25 @@ function LandingPage(){
                     
                     const formattedId = String(index + 1).padStart(3, "0");
                     return(
-                        <div key = {index}className="bg-white rounded-lg shadow-lg w-70 h-70 mt-10 justify-end flex flex-col items-center hover:scale-110 transition-transform duration-200">
-                            <Image
-                                src={`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${formattedId}.png`}
-                                alt="Pokemon"
-                                width={200}
-                                height={200}
-                                />
-                            <h2>
-                                {formattedId}
-                            </h2>
-                            <h2 className="capitalize font-bold text-xl">
-                                {pokemon.name} 
-                            </h2>
-                            <h2>
-                                Type: {pokemon.type} 
-                            </h2>
-                        </div>
+                        <Link href={`/pokemon/${pokemon.id}`} key={pokemon.id}>
+                            <div className="bg-white rounded-lg shadow-lg w-70 h-70 mt-10 justify-end flex flex-col items-center hover:scale-110 transition-transform duration-200 cursor-pointer">
+                                <Image
+                                    src={`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${formattedId}.png`}
+                                    alt="Pokemon"
+                                    width={200}
+                                    height={200}
+                                    />
+                                <h2>
+                                    {formattedId}
+                                </h2>
+                                <h2 className="capitalize font-bold text-xl">
+                                    {pokemon.name} 
+                                </h2>
+                                <h2>
+                                    Type: {pokemon.type} 
+                                </h2>
+                            </div>
+                        </Link>
                     )
                 })}
                 
